@@ -8,6 +8,9 @@ import PrettyError from 'pretty-error';
 import http from 'http';
 import SocketIo from 'socket.io';
 
+import {data} from '../src/redux/data/data';
+import mypageReducer from '../src/redux/modules/mypage';
+
 const pretty = new PrettyError();
 const app = express();
 
@@ -55,6 +58,8 @@ app.use((req, res) => {
 const bufferSize = 100;
 const messageBuffer = new Array(bufferSize);
 let messageIndex = 0;
+var state = data;
+
 
 if (config.apiPort) {
   const runnable = app.listen(config.apiPort, (err) => {
@@ -65,24 +70,12 @@ if (config.apiPort) {
     console.info('==> 💻  Send requests to http://%s:%s', config.apiHost, config.apiPort);
   });
 
+
   io.on('connection', (socket) => {
-    socket.emit('news', {msg: `'Hello World!' from server`});
-
-    socket.on('history', () => {
-      for (let index = 0; index < bufferSize; index++) {
-        const msgNo = (messageIndex + index) % bufferSize;
-        const msg = messageBuffer[msgNo];
-        if (msg) {
-          socket.emit('msg', msg);
-        }
-      }
-    });
-
-    socket.on('msg', (data) => {
-      data.id = messageIndex;
-      messageBuffer[messageIndex % bufferSize] = data;
-      messageIndex++;
-      io.emit('msg', data);
+    socket.emit('initData', state);
+    socket.on('action', (action)=>{
+      state = mypageReducer(state, action);
+      socket.broadcast.emit('initData', state);
     });
   });
   io.listen(runnable);

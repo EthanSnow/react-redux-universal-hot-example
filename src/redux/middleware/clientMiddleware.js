@@ -4,6 +4,12 @@ export default function clientMiddleware(client) {
       if (typeof action === 'function') {
         return action(dispatch, getState);
       }
+      console.log(action.meta == // eslint-disable-line eqeqeq
+        "clinet2server"); // eslint-disable-line quotes
+      if ((global.socket) && action.meta == 'client2server') { // eslint-disable-line eqeqeq
+        global.socket.emit('action', action);
+        console.log('middleware emit');
+      }
 
       const { promise, types, ...rest } = action; // eslint-disable-line no-redeclare
       if (!promise) {

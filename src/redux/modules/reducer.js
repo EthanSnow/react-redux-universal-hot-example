@@ -4,6 +4,7 @@ import { routerReducer } from 'react-router-redux';
 import {reducer as reduxAsyncConnect} from 'redux-async-connect';
 
 import auth from './auth';
+import mypage from './mypage';
 import counter from './counter';
 import {reducer as form} from 'redux-form';
 import info from './info';
@@ -19,6 +20,7 @@ export default combineReducers({
     counter2: counter,
     counter3: counter
   }),
+  mypage,
   info,
   widgets
 });
